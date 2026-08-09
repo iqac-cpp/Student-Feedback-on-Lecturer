@@ -403,6 +403,87 @@
     .status.success { color: var(--success); }
     .status.error { color: var(--error); }
 
+    /* Success popup */
+    .success-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(7, 27, 48, .55);
+      backdrop-filter: blur(3px);
+    }
+
+    .success-modal.show {
+      display: flex;
+    }
+
+    .success-dialog {
+      width: min(100%, 390px);
+      background: #fff;
+      border-radius: 18px;
+      padding: 28px 22px 22px;
+      text-align: center;
+      box-shadow: 0 22px 70px rgba(10, 35, 60, .28);
+      animation: successPop .18s ease-out;
+    }
+
+    @keyframes successPop {
+      from { opacity: 0; transform: translateY(8px) scale(.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .success-icon {
+      width: 68px;
+      height: 68px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #eaf7ef;
+      color: var(--success);
+      font-size: 38px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .success-dialog h2 {
+      margin: 0 0 8px;
+      color: var(--navy);
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    .success-dialog p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .success-close-btn {
+      width: 100%;
+      min-height: 48px;
+      margin-top: 20px;
+      border: 0;
+      border-radius: 11px;
+      background: var(--navy);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .success-close-btn:hover { background: #0d2d4d; }
+    .success-close-btn:active { transform: translateY(1px); }
+
+    body.modal-open {
+      overflow: hidden;
+    }
+
     .privacy {
       margin: 14px 0 0;
       text-align: center;
@@ -541,7 +622,7 @@
       body { background: #fff; }
       .shell { width: 100%; margin: 0; }
       .hero { color: #111; background: #fff; border: 1px solid #aaa; box-shadow: none; }
-      .hero p, .progress-wrap, .scale-panel, .submit-area, .privacy { display: none !important; }
+      .hero p, .progress-wrap, .scale-panel, .submit-area, .privacy, .success-modal { display: none !important; }
       .panel, .question-card, .summary-panel { box-shadow: none; break-inside: avoid; }
       .questions { gap: 7px; }
       .question-card { border-radius: 0; }
@@ -681,6 +762,15 @@
     </form>
   </main>
 
+  <div id="successModal" class="success-modal" aria-hidden="true">
+    <div class="success-dialog" role="dialog" aria-modal="true" aria-labelledby="successTitle" aria-describedby="successMessage">
+      <div class="success-icon" aria-hidden="true">✓</div>
+      <h2 id="successTitle">Feedback Submitted</h2>
+      <p id="successMessage">Your feedback has been submitted successfully. Thank you for your valuable feedback.</p>
+      <button id="successCloseBtn" class="success-close-btn" type="button">CLOSE</button>
+    </div>
+  </div>
+
   <script>
     // Paste the deployed Google Apps Script Web App URL here.
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwgMKntGBWbKzh4ZrssQ5SRHwmF28DOriY0ZQ5vqpes1qu6ZNGTumyHSdtsgG2UlxcToA/exec";
@@ -819,6 +909,8 @@
     const progressText = document.getElementById("progressText");
     const statusEl = document.getElementById("status");
     const submitBtn = document.getElementById("submitBtn");
+    const successModal = document.getElementById("successModal");
+    const successCloseBtn = document.getElementById("successCloseBtn");
     const dateInput = document.getElementById("date");
     const zoneSelect = document.getElementById("zone");
     const districtSelect = document.getElementById("district");
@@ -1065,6 +1157,34 @@
     courseSelect.addEventListener("change", updateClassLabel);
     form.addEventListener("change", updateSummary);
 
+    function openSuccessModal() {
+      successModal.classList.add("show");
+      successModal.setAttribute("aria-hidden", "false");
+      document.body.classList.add("modal-open");
+      setTimeout(() => successCloseBtn.focus(), 50);
+    }
+
+    function closeSuccessModal() {
+      successModal.classList.remove("show");
+      successModal.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("modal-open");
+      submitBtn.focus();
+    }
+
+    successCloseBtn.addEventListener("click", closeSuccessModal);
+
+    successModal.addEventListener("click", (event) => {
+      if (event.target === successModal) {
+        closeSuccessModal();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && successModal.classList.contains("show")) {
+        closeSuccessModal();
+      }
+    });
+
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       statusEl.className = "status";
@@ -1140,15 +1260,15 @@
           body: new URLSearchParams(data).toString()
         });
 
-        statusEl.className = "status success";
-        statusEl.textContent = "Feedback submitted successfully. Thank you.";
+        statusEl.className = "status";
+        statusEl.textContent = "";
         form.reset();
         populateZones();
         updateCourseDropdown();
         updateClassLabel();
         setToday();
         updateSummary();
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        openSuccessModal();
       } catch (error) {
         console.error(error);
         statusEl.className = "status error";
