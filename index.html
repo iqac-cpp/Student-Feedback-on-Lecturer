@@ -446,10 +446,34 @@
       outline-offset: 2px;
     }
 
-    .rating-option input:checked + label {
+    .rating-option input[value="2"]:checked + label {
       color: #fff;
-      background: var(--navy);
-      border-color: var(--navy);
+      background: #d92d27;
+      border-color: #c62520;
+    }
+
+    .rating-option input[value="4"]:checked + label {
+      color: #5b2427;
+      background: #f2a3a6;
+      border-color: #e38e92;
+    }
+
+    .rating-option input[value="6"]:checked + label {
+      color: #24543a;
+      background: #b9efd1;
+      border-color: #9cdeb9;
+    }
+
+    .rating-option input[value="8"]:checked + label {
+      color: #174c2a;
+      background: #5ad47d;
+      border-color: #4bc16e;
+    }
+
+    .rating-option input[value="10"]:checked + label {
+      color: #fff;
+      background: #206b3c;
+      border-color: #185b32;
     }
 
     .summary-panel {
