@@ -40,6 +40,41 @@
 
     button, input, select { font: inherit; }
 
+    .hero {
+      position: relative;
+    }
+
+    .hero-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .hero-copy {
+      min-width: 0;
+      flex: 1 1 auto;
+    }
+
+    .reports-tab {
+      flex: 0 0 auto;
+      min-height: 42px;
+      border: 1px solid rgba(255,255,255,.35);
+      border-radius: 999px;
+      padding: 9px 20px;
+      background: #f0a400;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .1px;
+      cursor: pointer;
+      box-shadow: 0 5px 14px rgba(0,0,0,.14);
+      transition: transform .12s ease, filter .12s ease;
+    }
+
+    .reports-tab:hover { filter: brightness(1.04); }
+    .reports-tab:active { transform: translateY(1px); }
+
     .shell {
       width: min(100% - 32px, 980px);
       margin: 28px auto 54px;
@@ -615,6 +650,16 @@
       }
 
       .hero-inner { padding: 22px 18px 18px; }
+
+      .hero-top {
+        gap: 10px;
+      }
+
+      .reports-tab {
+        min-height: 38px;
+        padding: 8px 14px;
+        font-size: 11.5px;
+      }
       .hero h1 { font-size: 24px; }
       .hero p { font-size: 13px; }
       .progress-wrap { padding: 0 18px 18px; }
@@ -737,8 +782,13 @@
   <main class="shell">
     <header class="hero">
       <div class="hero-inner">
-        <h1>STUDENT FEEDBACK FORM ON LECTURER</h1>
-        <p>Academic Year 2026-27 · Please rate all 20 items. Your feedback is anonymous.</p>
+        <div class="hero-top">
+          <div class="hero-copy">
+            <h1>STUDENT FEEDBACK FORM ON LECTURER</h1>
+            <p>Academic Year 2026-27 · Please rate all 20 items. Your feedback is anonymous.</p>
+          </div>
+          <button id="reportsTab" class="reports-tab" type="button">REPORTS</button>
+        </div>
       </div>
       <div class="progress-wrap" aria-label="Form progress">
         <div class="progress-track" aria-hidden="true">
@@ -875,6 +925,18 @@
   <script>
     // Paste the deployed Google Apps Script Web App URL here.
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwgMKntGBWbKzh4ZrssQ5SRHwmF28DOriY0ZQ5vqpes1qu6ZNGTumyHSdtsgG2UlxcToA/exec";
+
+    function openReportsPortal() {
+      const url = GOOGLE_SCRIPT_URL + '?page=reports';
+      const reportWindow = window.open(url, '_blank');
+
+      if (!reportWindow) {
+        window.location.href = url;
+      }
+    }
+
+    document.getElementById('reportsTab').addEventListener('click', openReportsPortal);
+
 
     const ACADEMIC_YEAR = "2026-27";
 
